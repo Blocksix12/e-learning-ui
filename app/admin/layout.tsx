@@ -1,7 +1,8 @@
 import Sidebar from "@/components/dashboard/Sidebar"
 import TopNavbar from "@/components/dashboard/TopNavBar"
+import type { ReactNode } from "react"
 
-export default function AdminLayout({ children }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div>
 

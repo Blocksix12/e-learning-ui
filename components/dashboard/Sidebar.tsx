@@ -23,12 +23,14 @@ export default function Sidebar({ role }: Props) {
       { name: "Courses", icon: "menu_book", path: "/lecturer/courses" },
       { name: "Students", icon: "groups", path: "/lecturer/students" },
       { name: "Assignments", icon: "assignment", path: "/lecturer/assignments" },
+      { name: "Analytics", icon: "monitoring", path: "/lecturer/analytics" },
     ],
 
     student: [
       { name: "Dashboard", icon: "dashboard", path: "/student/dashboard" },
       { name: "My Learning", icon: "school", path: "/student/courses" },
       { name: "Assignments", icon: "assignment", path: "/student/assignments" },
+      { name: "AI Insights", icon: "auto_awesome", path: "/student/analytics" },
       { name: "Messages", icon: "chat", path: "/student/messages" },
     ],
   }
