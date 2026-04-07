@@ -1,46 +1,18 @@
-import TaskCard from "./TaskCard";
-import type { Task } from "./TaskCard";
-
-const tasks: Task[] = [
-  {
-    title: "Natural Language Processing - Ethics Essay",
-    meta: { kind: "due", label: "Due in 2 days" },
-    priority: "High",
-    progress: 65,
-    accent: "primary",
-    leadingIcon: "file",
-    showAttachmentAction: true,
-    progressAccent: "primary",
-  },
-  {
-    title: "Quantum Mechanics Problem Set 4",
-    meta: { kind: "completed", label: "Completed yesterday" },
-    priority: "Medium",
-    progress: 100,
-    accent: "secondary",
-    leadingIcon: "check",
-    showVerifiedAction: true,
-    progressAccent: "secondary",
-  },
-  {
-    title: "Biochemistry Lab Report: Enzyme Kinetics",
-    meta: { kind: "due", label: "Due in 5 days" },
-    priority: "Medium",
-    progress: 15,
-    accent: "tertiary",
-    leadingIcon: "science",
-    showAttachmentAction: true,
-    progressAccent: "primary",
-  },
-];
+import { assignments } from "./mockData";
+import TaskAssignmentItem from "./TaskAssignmentItem";
 
 export default function TaskList() {
   return (
     <div className="space-y-4">
-      <h4 className="text-xl font-bold px-2">Active Assignments</h4>
+      <div className="mb-2 flex items-center justify-between px-1">
+        <h4 className="text-lg font-bold">Active Assignments</h4>
+        <button type="button" className="text-sm font-medium text-indigo-600">
+          View Calendar
+        </button>
+      </div>
 
-      {tasks.map((task, i) => (
-        <TaskCard key={i} task={task} />
+      {assignments.map((assignment) => (
+        <TaskAssignmentItem key={assignment.id} assignment={assignment} />
       ))}
     </div>
   );

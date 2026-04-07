@@ -63,10 +63,12 @@ export default function TaskCard({ task }: { task: Task }) {
   const metaIcon = task.meta.kind === "completed" ? CheckCheck : Clock;
   const MetaIcon = metaIcon;
   const { iconWrap } = accentClasses(task.accent);
-  const progressBarClassName =
-    task.progressAccent === "secondary" ? "bg-secondary" : "bg-primary";
   const percentageTextClassName =
     task.progressAccent === "secondary" ? "text-secondary" : "text-primary";
+  const progressValueClassName =
+    task.progressAccent === "secondary"
+      ? "[&::-webkit-progress-value]:bg-secondary [&::-moz-progress-bar]:bg-secondary"
+      : "[&::-webkit-progress-value]:bg-primary [&::-moz-progress-bar]:bg-primary";
 
   return (
     <div className="group bg-surface-container-lowest rounded-xl p-5 flex flex-col md:flex-row md:items-center gap-4 hover:shadow-md transition-all border border-transparent hover:border-primary/10">
@@ -102,12 +104,13 @@ export default function TaskCard({ task }: { task: Task }) {
             {task.progress}%
           </span>
         </div>
-        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-          <div
-            className={`h-full ${progressBarClassName} rounded-full`}
-            style={{ width: `${task.progress}%` }}
-          />
-        </div>
+        <progress
+          className={`h-1.5 w-full overflow-hidden rounded-full [&::-webkit-progress-bar]:bg-slate-100 [&::-webkit-progress-value]:rounded-full [&::-moz-progress-bar]:rounded-full ${progressValueClassName}`}
+          value={task.progress}
+          max={100}
+        >
+          {task.progress}%
+        </progress>
       </div>
 
       <div className="flex items-center gap-2">

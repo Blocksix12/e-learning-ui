@@ -4,7 +4,7 @@ import TaskHeader from "@/components/Task/TaskHeader";
 
 export default function TasksLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto w-full">
+    <div className="mx-auto w-full max-w-7xl px-6 pb-12 pt-8 md:px-8">
       <TaskHeader />
       {children}
     </div>

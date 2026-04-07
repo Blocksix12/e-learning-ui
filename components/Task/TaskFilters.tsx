@@ -1,16 +1,23 @@
+import Image from "next/image";
+import { BookOpenText, CircleCheckBig, PlayCircle } from "lucide-react";
+
+import { learningResources } from "./mockData";
+
 export default function TaskFilters() {
   return (
-    <div className="lg:col-span-3 space-y-6">
-      <section className="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
-        <p className="text-xs font-bold text-primary mb-4 uppercase">
-          Weekly Progress
-        </p>
+    <div className="space-y-6 lg:col-span-4">
+      <section className="relative overflow-hidden rounded-2xl bg-indigo-700 p-8 text-white shadow-xl shadow-indigo-700/30">
+        <div className="absolute -bottom-6 -right-4 opacity-20">
+          <CircleCheckBig className="h-24 w-24" />
+        </div>
 
-        <div className="flex items-center justify-center mb-4">
-          <div className="relative flex items-center justify-center">
-            <svg className="w-24 h-24 transform -rotate-90" aria-hidden="true">
+        <h3 className="mb-8 text-lg font-bold">Weekly Progress</h3>
+
+        <div className="flex items-center gap-6">
+          <div className="relative flex h-24 w-24 items-center justify-center">
+            <svg className="h-full w-full -rotate-90" aria-hidden="true">
               <circle
-                className="text-slate-100"
+                className="text-indigo-500/30"
                 cx="48"
                 cy="48"
                 fill="transparent"
@@ -19,7 +26,7 @@ export default function TaskFilters() {
                 strokeWidth="8"
               />
               <circle
-                className="text-primary"
+                className="text-white"
                 cx="48"
                 cy="48"
                 fill="transparent"
@@ -32,67 +39,86 @@ export default function TaskFilters() {
             </svg>
             <span className="absolute text-xl font-bold">75%</span>
           </div>
+
+          <div>
+            <p className="text-4xl font-bold leading-none">12 / 16</p>
+            <p className="mt-1 text-sm font-medium text-indigo-200">
+              Tasks Finished
+            </p>
+          </div>
         </div>
 
-        <p className="text-center text-sm text-slate-500">
-          12 of 16 tasks finished
-        </p>
+        <div className="mt-8 grid grid-cols-2 gap-4 border-t border-white/10 pt-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-indigo-200/70">
+              In Progress
+            </p>
+            <p className="text-xl font-bold">04</p>
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-indigo-200/70">
+              Upcoming
+            </p>
+            <p className="text-xl font-bold">07</p>
+          </div>
+        </div>
       </section>
 
-      <section className="bg-surface-container-low p-2 rounded-xl">
-        <p className="px-4 py-2 text-xs font-bold text-slate-400 uppercase">
-          Filters
-        </p>
-        <div className="space-y-1">
-          <FilterButton
-            active
-            label="All Tasks"
-            badgeClassName="text-xs bg-primary/10 px-2 py-0.5 rounded-full"
-            badgeText="24"
-          />
-          <FilterButton
-            label="In Progress"
-            badgeClassName="text-xs bg-slate-200 px-2 py-0.5 rounded-full"
-            badgeText="8"
-          />
-          <FilterButton
-            label="High Priority"
-            badgeClassName="text-xs bg-error-container text-on-error-container px-2 py-0.5 rounded-full"
-            badgeText="4"
-          />
-          <FilterButton
-            label="Completed"
-            badgeClassName="text-xs bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full"
-            badgeText="12"
-          />
+      <section className="rounded-2xl bg-surface-container-low p-6">
+        <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-slate-500">
+          Required Learning
+        </h3>
+
+        <div className="space-y-3">
+          {learningResources.map((resource) => {
+            const Icon = resource.type === "book" ? BookOpenText : PlayCircle;
+            const colorClassName =
+              resource.type === "book"
+                ? "bg-indigo-50 text-indigo-600"
+                : "bg-emerald-50 text-emerald-600";
+
+            return (
+              <button
+                key={resource.id}
+                type="button"
+                className="flex w-full items-center gap-4 rounded-xl bg-white p-4 text-left transition hover:shadow-md"
+              >
+                <span
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${colorClassName}`}
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block text-xs font-bold text-on-background">
+                    {resource.title}
+                  </span>
+                  <span className="block text-[10px] text-slate-400">
+                    {resource.meta}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="group relative aspect-video overflow-hidden rounded-2xl shadow-lg">
+        <Image
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv2iIkWngUYK-e0G2QpE81CVitZt47O8mWvsi1TYYazpswdU4enzAIk0nIUHkFri-n8q4TZUJ4cCCGST6z8HUCWjvenLZWujVv7Q-ejR1xLThxrGmUfxSOq1l-JQT7KRCN5VRUZ1PqSpn6JSnfz6zQQvRHXiknc1F9QYDwPAd_nVXJ6Ue3ymD-hPPQVUyhkXhh-9NIArJ3cQ9A27ADkQdnJBXMAutuGg93Z9UweAEA8BvBD-lqfuCuDJnwoZVNkBtC7qaX5_pa-7rE"
+          alt="Scientific chalkboard with complex physics equations"
+          fill
+          className="object-cover transition duration-300 group-hover:scale-105"
+          sizes="(max-width: 1024px) 100vw, 30vw"
+        />
+        <div className="absolute inset-0 flex items-end bg-linear-to-t from-black/60 to-transparent p-6">
+          <div className="text-white">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest opacity-70">
+              Focus Topic
+            </p>
+            <h4 className="text-lg font-bold">String Theory Foundations</h4>
+          </div>
         </div>
       </section>
     </div>
-  );
-}
-
-function FilterButton({
-  label,
-  badgeText,
-  badgeClassName,
-  active,
-}: {
-  label: string;
-  badgeText: string;
-  badgeClassName: string;
-  active?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      className={
-        active
-          ? "w-full text-left px-4 py-2 rounded-lg bg-surface-container-lowest text-primary font-semibold flex justify-between items-center"
-          : "w-full text-left px-4 py-2 rounded-lg text-slate-600 hover:bg-white/50 transition-colors flex justify-between items-center"
-      }
-    >
-      {label}
-      <span className={badgeClassName}>{badgeText}</span>
-    </button>
   );
 }
