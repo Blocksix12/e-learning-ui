@@ -1,39 +1,79 @@
+"use client";
+
 import Image from "next/image";
-import { Bell, Search } from "lucide-react";
+import Link from "next/link";
+import { Bell, Settings } from "lucide-react";
+import { usePathname } from "next/navigation";
+
+const NAV_ITEMS = [
+  { href: "/admin/dashboard", label: "Dashboard" },
+  { href: "/", label: "Home" },
+  { href: "/class/class-dashboard", label: "Class" },
+  { href: "/admin/tasks", label: "Task" },
+  { href: "/admin/courses", label: "Course" },
+  { href: "/admin/analytics", label: "Exam" },
+  { href: "/admin/tasks", label: "Homework" },
+  { href: "/student/ai-insights", label: "AI" },
+];
 
 export default function Topbar() {
+  const pathname = usePathname();
+
   return (
-    <header className="fixed top-0 right-0 left-0 md:left-64 z-40 bg-white/80 backdrop-blur-xl h-16 flex items-center justify-between px-6">
-      <div className="flex items-center gap-4 flex-1">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-[18px] w-[18px]" />
-          <input
-            type="text"
-            placeholder="Search assignments..."
-            className="w-full bg-slate-100/50 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20"
-          />
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/80 shadow-[0px_20px_40px_rgba(21,28,39,0.06)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="flex h-16 items-center justify-between gap-4 px-6">
+        <div className="flex items-center gap-8">
+          <Link
+            href="/class/class-dashboard"
+            className="text-xl font-bold tracking-tighter text-indigo-600 transition hover:text-indigo-500 dark:text-indigo-400"
+          >
+            The Academic Curator
+          </Link>
+
+          <nav className="hidden items-center gap-6 md:flex">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={
+                  pathname === item.href
+                    ? "border-b-2 border-indigo-600 pb-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400"
+                    : "text-sm font-medium text-slate-500 transition hover:text-indigo-500 dark:text-slate-400"
+                }
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
-      </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors relative"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full" />
-        </button>
+        <div className="flex items-center gap-3 md:gap-4">
+          <button
+            type="button"
+            aria-label="Notifications"
+            className="rounded-lg p-2 text-slate-500 transition-all hover:bg-indigo-50/50 hover:text-indigo-600 active:scale-95 dark:text-slate-300 dark:hover:bg-indigo-900/20"
+          >
+            <Bell className="h-5 w-5" />
+          </button>
 
-        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
-          <Image
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFE3WsWfHYmO1EAoqZHiLfdL9Fk_4bNHPByQcESFXBIxSNRjAbNt6ZpN1eQV6ux_GbHHaQn3Q5I98BKdf5lkLouMnaLb14Kj9rXy3hCDXX76QqvHi9iurAqwfXDJIG_QEJB39b9jw-qMnci3dYP6hJAvVZEMUvHmrY852DD2GdaYXjzQ_TVgfrG7p0Se3Cntd3-xlkKk-CKZEUxUjbdYx7eAjvOxx9XtDRkIOn3fQhMkhQ6x5MHGEuKaPCIZeBljTdu8l-bcDjgCaa"
-            alt="User Profile"
-            width={32}
-            height={32}
-            className="w-full h-full object-cover"
-            priority
-          />
+          <button
+            type="button"
+            aria-label="Settings"
+            className="rounded-lg p-2 text-slate-500 transition-all hover:bg-indigo-50/50 hover:text-indigo-600 active:scale-95 dark:text-slate-300 dark:hover:bg-indigo-900/20"
+          >
+            <Settings className="h-5 w-5" />
+          </button>
+
+          <div className="ml-2 h-10 w-10 overflow-hidden rounded-full border-2 border-primary-fixed bg-slate-200">
+            <Image
+              src="https://i.pravatar.cc/80?img=11"
+              alt="Lecturer profile picture"
+              width={40}
+              height={40}
+              className="h-full w-full object-cover"
+              priority
+            />
+          </div>
         </div>
       </div>
     </header>
