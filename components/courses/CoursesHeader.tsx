@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Plus } from "lucide-react";
 
 export default function CoursesHeader() {
@@ -14,13 +15,13 @@ export default function CoursesHeader() {
         </p>
       </div>
 
-      <button
-        type="button"
+      <Link
+        href="/admin/courses/create-course"
         className="flex items-center gap-2 px-6 py-3 bg-indigo-700 text-white rounded-full font-semibold shadow-lg shadow-indigo-700/20 hover:scale-[1.02] transition-all"
       >
         <Plus className="h-5 w-5" />
         Create New Course
-      </button>
+      </Link>
     </header>
   );
 }

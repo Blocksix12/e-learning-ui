@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import CourseSidebar from "@/components/courses/CourseSidebar";
+import CourseCreatorSidebar from "@/components/courses/create-course/CourseCreatorSidebar";
 import TaskSidebar from "../Task/TaskSidebar";
 
 type AdminShellProps = {
@@ -16,12 +17,17 @@ export default function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
   const isTasksRoute = pathname.startsWith("/admin/tasks");
   const isCoursesRoute = pathname.startsWith("/admin/courses");
+  const isCreateCourseRoute = pathname.startsWith(
+    "/admin/courses/create-course",
+  );
   const isCreateClassRoute = pathname.startsWith(
     "/admin/class-management/create-class",
   );
 
   const sidebar = isCreateClassRoute ? null : isTasksRoute ? (
     <TaskSidebar />
+  ) : isCreateCourseRoute ? (
+    <CourseCreatorSidebar />
   ) : isCoursesRoute ? (
     <CourseSidebar />
   ) : (
