@@ -15,8 +15,8 @@ import { usePathname } from "next/navigation";
 const TASK_NAV_ITEMS = [
   { href: "/admin/tasks/overview", label: "Overview", icon: LayoutGrid },
   { href: "/admin/tasks/list", label: "Task List", icon: ListChecks },
-  { href: "/admin/tasks", label: "Schedule", icon: CalendarDays },
-  { href: "#", label: "Resources", icon: FolderOpen },
+  { href: "/admin/tasks/schedule", label: "Schedule", icon: CalendarDays },
+  { href: "/admin/tasks/resources", label: "Resources", icon: FolderOpen },
   { href: "/admin/tasks/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
@@ -24,7 +24,7 @@ export default function TaskSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-slate-200 bg-slate-50 px-4 py-6 lg:flex lg:flex-col">
+    <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 border-r border-slate-200 bg-slate-50 px-4 py-6 md:flex md:flex-col dark:border-slate-800 dark:bg-slate-950">
       <div className="px-4 py-2">
         <h2 className="text-lg font-black text-slate-900">Advanced Physics</h2>
         <p className="mt-1 text-xs font-semibold tracking-widest text-slate-500 uppercase">

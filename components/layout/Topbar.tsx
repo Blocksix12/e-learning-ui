@@ -32,7 +32,10 @@ export default function Topbar() {
 
           <nav className="hidden items-center gap-6 md:flex">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
+              const isTaskNavItem = item.href === "/admin/tasks/list";
+              const isActive = isTaskNavItem
+                ? pathname.startsWith("/admin/tasks/")
+                : pathname === item.href;
               const linkClassName = isActive
                 ? "border-b-2 border-indigo-600 pb-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400"
                 : "text-sm font-medium text-slate-500 transition hover:text-indigo-500 dark:text-slate-400";

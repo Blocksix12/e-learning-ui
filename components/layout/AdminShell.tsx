@@ -17,6 +17,7 @@ export default function AdminShell({ children }: AdminShellProps) {
   const pathname = usePathname();
   const isTasksRoute = pathname.startsWith("/admin/tasks");
   const isTaskMemberRoute = pathname.startsWith("/admin/tasks/members");
+  const isTaskDeadlinesRoute = pathname.startsWith("/admin/tasks/deadlines");
   const isCoursesRoute = pathname.startsWith("/admin/courses");
   const isCreateCourseRoute = pathname.startsWith(
     "/admin/courses/create-course",
@@ -26,7 +27,7 @@ export default function AdminShell({ children }: AdminShellProps) {
   );
 
   const sidebar =
-    isCreateClassRoute ? null : isTaskMemberRoute ? null : isTasksRoute ? (
+    isCreateClassRoute ? null : isTaskMemberRoute ? null : isTaskDeadlinesRoute ? null : isTasksRoute ? (
       <TaskSidebar />
     ) : isCreateCourseRoute ? (
       <CourseCreatorSidebar />

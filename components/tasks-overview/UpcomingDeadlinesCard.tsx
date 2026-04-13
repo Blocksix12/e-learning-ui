@@ -86,7 +86,7 @@ export default function UpcomingDeadlinesCard({
       </div>
 
       <Link
-        href="#"
+        href="/admin/tasks/deadlines"
         className="mt-8 inline-flex w-full items-center justify-center rounded-xl border border-indigo-100 py-3 text-xs font-bold text-indigo-700 transition hover:bg-indigo-50 hover:text-indigo-800"
       >
         View All Deadlines
