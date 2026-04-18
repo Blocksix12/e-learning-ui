@@ -3,6 +3,8 @@ import type {
   DeadlineItem,
   ScheduleDay,
   TimelineRow,
+  WeekScheduleEvent,
+  WeekScheduleTimeline,
 } from "./types";
 
 export const SCHEDULE_TITLE = {
@@ -131,5 +133,56 @@ export const ACADEMIC_EVENTS: AcademicEvent[] = [
     title: "CS Student Mixer",
     subtitle: "South Quad • April 18, 17:00",
     variant: "secondary",
+  },
+];
+
+export const WEEK_SCHEDULE_TIMELINE: WeekScheduleTimeline = {
+  startHour: 8,
+  totalHours: 11,
+  hourHeightPx: 80,
+  topOffsetPx: 110,
+  currentTime: "10:30",
+};
+
+export const WEEK_SCHEDULE_EVENTS: WeekScheduleEvent[] = [
+  {
+    id: "week-quantum",
+    dayId: "mon",
+    startTime: "09:00",
+    endTime: "10:00",
+    label: "09:00 - 10:00",
+    title: "Quantum Mechanics Lecture",
+    variant: "primary",
+  },
+  {
+    id: "week-calculus",
+    dayId: "tue",
+    startTime: "10:00",
+    endTime: "11:00",
+    label: "10:00 - 11:00",
+    title: "Calculus II Midterm Quiz",
+    variant: "tertiary",
+    badge: "Ongoing",
+  },
+  {
+    id: "week-algorithms",
+    dayId: "fri",
+    startTime: "13:00",
+    endTime: "14:30",
+    label: "01:00 - 02:30",
+    title: "Advanced Algorithms Lab",
+    variant: "secondary",
+    participants: [
+      {
+        id: "participant-1",
+        name: "Student",
+        imageUrl: "https://i.pravatar.cc/64?img=47",
+      },
+      {
+        id: "participant-2",
+        name: "Student",
+        imageUrl: "https://i.pravatar.cc/64?img=12",
+      },
+    ],
   },
 ];

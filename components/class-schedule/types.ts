@@ -58,3 +58,31 @@ export type AcademicEvent = {
   subtitle: string;
   variant: "primary" | "secondary";
 };
+
+export type WeekScheduleParticipant = {
+  id: string;
+  name: string;
+  imageUrl: string;
+};
+
+export type WeekScheduleEventVariant = "primary" | "tertiary" | "secondary";
+
+export type WeekScheduleEvent = {
+  id: string;
+  dayId: string;
+  startTime: string;
+  endTime: string;
+  label: string;
+  title: string;
+  variant: WeekScheduleEventVariant;
+  badge?: string;
+  participants?: WeekScheduleParticipant[];
+};
+
+export type WeekScheduleTimeline = {
+  startHour: number;
+  totalHours: number;
+  hourHeightPx: number;
+  topOffsetPx: number;
+  currentTime: string;
+};

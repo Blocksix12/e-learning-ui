@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 import { SCHEDULE_DAYS, SCHEDULE_TITLE, TIMELINE_ROWS } from "./mockData";
 import type { ScheduleMode, TimelineEvent, TimelineRow } from "./types";
+import WeeklyScheduleGrid from "@/components/class-schedule/WeeklyScheduleGrid";
 
 function TimelineMetaIcon({
   icon,
@@ -260,57 +261,69 @@ export default function ClassScheduleView() {
           </div>
         </div>
 
-        <div className="no-scrollbar flex items-center justify-between overflow-x-auto pb-2">
-          {days.map((day) => (
-            <button
-              key={day.id}
-              type="button"
-              onClick={() => setActiveDayId(day.id)}
-              className="group flex min-w-[70px] cursor-pointer flex-col items-center gap-2 p-2"
-            >
-              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                {day.weekdayShort}
-              </span>
-              <div
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold transition-all",
-                  day.isActive
-                    ? "text-white"
-                    : "hover:bg-gray-100 text-gray-700",
-                )}
-                style={
-                  day.isActive
-                    ? {
-                        backgroundColor: "#4338CA",
-                        boxShadow: "0 4px 14px rgba(67,56,202,0.3)",
-                      }
-                    : {}
-                }
+        {mode === "day" ? (
+          <div className="no-scrollbar flex items-center justify-between overflow-x-auto pb-2">
+            {days.map((day) => (
+              <button
+                key={day.id}
+                type="button"
+                onClick={() => setActiveDayId(day.id)}
+                className="group flex min-w-[70px] cursor-pointer flex-col items-center gap-2 p-2"
               >
-                {day.dayOfMonth}
-              </div>
-              {day.isActive && (
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  {day.weekdayShort}
+                </span>
                 <div
-                  className="mt-1 h-1 w-1 rounded-full"
-                  style={{ backgroundColor: "#4338CA" }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold transition-all",
+                    day.isActive
+                      ? "text-white"
+                      : "hover:bg-gray-100 text-gray-700",
+                  )}
+                  style={
+                    day.isActive
+                      ? {
+                          backgroundColor: "#4338CA",
+                          boxShadow: "0 4px 14px rgba(67,56,202,0.3)",
+                        }
+                      : {}
+                  }
+                >
+                  {day.dayOfMonth}
+                </div>
+                {day.isActive && (
+                  <div
+                    className="mt-1 h-1 w-1 rounded-full"
+                    style={{ backgroundColor: "#4338CA" }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className="relative flex-1 overflow-hidden rounded-2xl bg-white p-8 shadow-sm">
-        <div className="space-y-12">
-          {TIMELINE_ROWS.map((row) => (
-            <TimelineRowView key={row.id} row={row} />
-          ))}
-        </div>
+        {mode === "week" ? (
+          <WeeklyScheduleGrid
+            days={days}
+            activeDayId={activeDayId}
+            onDayChange={setActiveDayId}
+          />
+        ) : (
+          <>
+            <div className="space-y-12">
+              {TIMELINE_ROWS.map((row) => (
+                <TimelineRowView key={row.id} row={row} />
+              ))}
+            </div>
 
-        <div className="pointer-events-none absolute left-20 right-0 top-52 z-10 flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full border-2 border-white bg-red-500 shadow-sm" />
-          <div className="h-0.5 flex-1 bg-red-500" />
-        </div>
+            <div className="pointer-events-none absolute left-20 right-0 top-52 z-10 flex items-center gap-2">
+              <div className="h-3 w-3 rounded-full border-2 border-white bg-red-500 shadow-sm" />
+              <div className="h-0.5 flex-1 bg-red-500" />
+            </div>
+          </>
+        )}
       </section>
 
       <button
