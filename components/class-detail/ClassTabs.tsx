@@ -22,7 +22,9 @@ export default function ClassTabs({
         const href =
           tab.key === "overview"
             ? "/class/class-detail"
-            : `/class/class-detail?tab=${tab.key}`;
+            : tab.key === "schedule"
+              ? "/class/schedule"
+              : `/class/class-detail?tab=${tab.key}`;
 
         return (
           <Link

@@ -18,7 +18,7 @@ const NAV_ITEMS = [
   { href: "/class/class-dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/class/classes", label: "Classes", icon: Users },
   {
-    href: "/class/class-detail?tab=schedule",
+    href: "/class/schedule",
     label: "Schedule",
     icon: Calendar,
   },
@@ -64,7 +64,7 @@ export default function Sidebar() {
             (item.label === "Classes" &&
               pathname.startsWith("/class/classes")) ||
             (item.label === "Schedule" &&
-              pathname.startsWith("/class/class-detail"));
+              pathname.startsWith("/class/schedule"));
 
           return (
             <Link

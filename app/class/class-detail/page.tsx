@@ -4,8 +4,8 @@ import ClassTabs from "@/components/class-detail/ClassTabs";
 import { CLASS_DETAIL } from "@/components/class-detail/mockData";
 import OverviewTab from "@/components/class-detail/OverviewTab";
 import RosterTab from "@/components/class-detail/RosterTab";
-import ScheduleTab from "@/components/class-detail/ScheduleTab";
 import type { ClassDetailTabKey } from "@/components/class-detail/types";
+import { redirect } from "next/navigation";
 
 function parseTab(tab: string | string[] | undefined): ClassDetailTabKey {
   const value = Array.isArray(tab) ? tab[0] : tab;
@@ -21,6 +21,10 @@ export default async function ClassDetailPage({
   const resolvedSearchParams = await searchParams;
   const activeTab = parseTab(resolvedSearchParams?.tab);
 
+  if (activeTab === "schedule") {
+    redirect("/class/schedule");
+  }
+
   return (
     <div className="min-h-screen">
       <ClassHero detail={CLASS_DETAIL} />
@@ -33,9 +37,7 @@ export default async function ClassDetailPage({
             <OverviewTab detail={CLASS_DETAIL} />
           ) : activeTab === "roster" ? (
             <RosterTab />
-          ) : (
-            <ScheduleTab detail={CLASS_DETAIL} />
-          )}
+          ) : null}
         </div>
 
         <div className="col-span-12 lg:col-span-4">
