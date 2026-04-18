@@ -1,191 +1,200 @@
-import Image from "next/image";
+"use client";
 
 import { cn } from "@/lib/utils";
-
 import { WEEK_SCHEDULE_EVENTS, WEEK_SCHEDULE_TIMELINE } from "./mockData";
-import type { ScheduleDay, WeekScheduleEvent } from "./types";
+import type {
+  ScheduleDay,
+  WeekScheduleEvent,
+  WeekScheduleEventVariant,
+} from "./types";
 
-const START_MINUTES = WEEK_SCHEDULE_TIMELINE.startHour * 60;
-const GRID_TOP_OFFSET_PX = WEEK_SCHEDULE_TIMELINE.topOffsetPx;
-const HOUR_HEIGHT_PX = WEEK_SCHEDULE_TIMELINE.hourHeightPx;
+// ─── Colour map per variant ───────────────────────────────────────────────────
+const VARIANT_BG: Record<WeekScheduleEventVariant, string> = {
+  primary: "#3730A3", // deep indigo  — online / lecture
+  tertiary: "#92400E", // amber-brown  — quiz / office hours
+  secondary: "#065F46", // emerald      — lab / in-person
+};
 
-function parseTimeToMinutes(value: string) {
-  const [hours, minutes] = value.split(":").map((part) => Number(part));
-  return hours * 60 + minutes;
+// ─── Time helpers ─────────────────────────────────────────────────────────────
+/** "13:30" → 810 (minutes since midnight) */
+function hhmm(str: string): number {
+  const [hh, mm] = str.split(":").map(Number);
+  return (hh ?? 0) * 60 + (mm ?? 0);
 }
 
-function minutesToTopPx(minutes: number) {
-  return GRID_TOP_OFFSET_PX + ((minutes - START_MINUTES) / 60) * HOUR_HEIGHT_PX;
+const { startHour, hourHeightPx } = WEEK_SCHEDULE_TIMELINE;
+const DAY_START_MIN = startHour * 60;
+const DAY_END_HOUR = startHour + WEEK_SCHEDULE_TIMELINE.totalHours;
+const TOTAL_H = WEEK_SCHEDULE_TIMELINE.totalHours * hourHeightPx;
+const HOURS = Array.from(
+  { length: WEEK_SCHEDULE_TIMELINE.totalHours },
+  (_, i) => startHour + i,
+);
+
+function topPx(startMin: number) {
+  return ((startMin - DAY_START_MIN) / 60) * hourHeightPx;
+}
+function heightPx(durMin: number) {
+  return Math.max((durMin / 60) * hourHeightPx, 36);
 }
 
-function durationToHeightPx(startMinutes: number, endMinutes: number) {
-  return ((endMinutes - startMinutes) / 60) * HOUR_HEIGHT_PX;
+function formatHour(h: number) {
+  const p = h < 12 ? "AM" : "PM";
+  const d = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  return `${d} ${p}`;
 }
 
-function TimelineColumn() {
-  const labels = Array.from(
-    { length: WEEK_SCHEDULE_TIMELINE.totalHours },
-    (_, i) => WEEK_SCHEDULE_TIMELINE.startHour + i,
-  ).map((hour) => {
-    const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-    const period = hour < 12 ? "AM" : "PM";
-    const padded = String(hour12).padStart(2, "0");
-    return `${padded} ${period}`;
-  });
-
+// ─── Current-time red indicator ───────────────────────────────────────────────
+function NowLine() {
+  const nowMin = hhmm(WEEK_SCHEDULE_TIMELINE.currentTime);
+  const top = topPx(nowMin);
   return (
-    <div className="flex flex-col border-r border-slate-50 pt-14">
-      {labels.map((label) => (
-        <div
-          key={label}
-          className="flex h-[80px] items-start justify-end pr-4 text-[11px] font-bold uppercase tracking-widest text-slate-400"
-        >
-          {label}
-        </div>
-      ))}
+    <div
+      className="pointer-events-none absolute inset-x-0 z-20 flex items-center"
+      style={{ top }}
+    >
+      <div className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-white bg-red-500 shadow" />
+      <div className="h-px flex-1 bg-red-500" />
     </div>
   );
 }
 
-function EventCard({ event }: { event: WeekScheduleEvent }) {
-  const startMinutes = parseTimeToMinutes(event.startTime);
-  const endMinutes = parseTimeToMinutes(event.endTime);
+// ─── Overlap resolver ─────────────────────────────────────────────────────────
+type Positioned = {
+  event: WeekScheduleEvent;
+  colOffset: number;
+  colTotal: number;
+};
 
-  const top = minutesToTopPx(startMinutes);
-  const height = durationToHeightPx(startMinutes, endMinutes);
+function resolveOverlaps(events: WeekScheduleEvent[]): Positioned[] {
+  const sorted = [...events].sort(
+    (a, b) => hhmm(a.startTime) - hhmm(b.startTime),
+  );
+  const result: Positioned[] = [];
+  const groups: WeekScheduleEvent[][] = [];
 
-  if (event.variant === "primary") {
-    return (
-      <div
-        className="absolute left-2 right-2 z-10 rounded-2xl bg-primary-container p-3 text-on-primary-container shadow-sm"
-        style={{ top, height }}
-      >
-        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest opacity-70">
+  for (const ev of sorted) {
+    const start = hhmm(ev.startTime);
+    const end = hhmm(ev.endTime);
+    const group = groups.find((g) =>
+      g.some((e) => start < hhmm(e.endTime) && end > hhmm(e.startTime)),
+    );
+    if (group) group.push(ev);
+    else groups.push([ev]);
+  }
+
+  for (const group of groups) {
+    group.forEach((ev, i) =>
+      result.push({ event: ev, colOffset: i, colTotal: group.length }),
+    );
+  }
+  return result;
+}
+
+// ─── Single event block ───────────────────────────────────────────────────────
+function EventBlock({ event, colOffset, colTotal }: Positioned) {
+  const startMin = hhmm(event.startTime);
+  const endMin = hhmm(event.endTime);
+  const top = topPx(startMin);
+  const height = heightPx(endMin - startMin);
+  const bg = VARIANT_BG[event.variant];
+
+  return (
+    <div
+      className="absolute overflow-hidden rounded-lg cursor-pointer transition-opacity hover:opacity-90"
+      style={{
+        top,
+        height,
+        left: `calc(${(colOffset / colTotal) * 100}% + 2px)`,
+        width: `calc(${100 / colTotal}% - 4px)`,
+        backgroundColor: bg,
+        color: "#fff",
+        zIndex: 10,
+      }}
+    >
+      <div className="h-full w-full overflow-hidden p-1.5 flex flex-col gap-0.5">
+        {/* Time */}
+        <span className="shrink-0 text-[9px] font-semibold leading-tight opacity-75 truncate">
           {event.label}
-        </p>
-        <p className="text-xs font-bold leading-tight">{event.title}</p>
-        <div className="mt-2 flex gap-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-white/40" />
-          <div className="h-1.5 w-1.5 rounded-full bg-white/40" />
-        </div>
-      </div>
-    );
-  }
+        </span>
 
-  if (event.variant === "tertiary") {
-    return (
-      <div
-        className="absolute left-2 right-2 z-20 rounded-2xl border border-white/20 bg-tertiary-container p-3 text-on-tertiary-container shadow-md"
-        style={{ top, height }}
-      >
-        <div className="mb-1 flex items-start justify-between">
-          <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">
-            {event.label}
-          </p>
-          <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
-        </div>
-        <p className="text-xs font-bold leading-tight">{event.title}</p>
-        {event.badge ? (
-          <p className="mt-2 inline-block rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-medium">
+        {/* Title */}
+        <span
+          className="text-[11px] font-bold leading-tight"
+          style={
+            {
+              display: "-webkit-box",
+              WebkitLineClamp: height > 80 ? 4 : height > 52 ? 2 : 1,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              wordBreak: "break-word",
+            } as React.CSSProperties
+          }
+        >
+          {event.title}
+        </span>
+
+        {/* Badge (e.g. "Ongoing") */}
+        {event.badge && height >= 72 && (
+          <span className="mt-auto shrink-0 text-[8px] font-bold uppercase tracking-widest opacity-75">
             {event.badge}
-          </p>
-        ) : null}
-      </div>
-    );
-  }
+          </span>
+        )}
 
-  return (
-    <div
-      className="absolute left-2 right-2 z-10 rounded-2xl bg-on-secondary-container p-3 text-white shadow-sm"
-      style={{ top, height }}
-    >
-      <p className="mb-1 text-[10px] font-bold uppercase tracking-widest opacity-70">
-        {event.label}
-      </p>
-      <p className="text-xs font-bold leading-tight">{event.title}</p>
-
-      {event.participants?.length ? (
-        <div className="mt-3 flex -space-x-2">
-          {event.participants.map((participant) => (
-            <div
-              key={participant.id}
-              className="relative h-6 w-6 overflow-hidden rounded-full border-2 border-on-secondary-container bg-slate-200"
-            >
-              <Image
-                src={participant.imageUrl}
-                alt={participant.name}
-                fill
-                sizes="24px"
-                className="object-cover"
-              />
+        {/* Participants avatars */}
+        {event.participants &&
+          event.participants.length > 0 &&
+          height >= 80 && (
+            <div className="mt-auto flex shrink-0 items-center gap-0.5">
+              {event.participants.slice(0, 3).map((p) => (
+                <img
+                  key={p.id}
+                  src={p.imageUrl}
+                  alt={p.name}
+                  className="h-5 w-5 rounded-full border border-white/40 object-cover"
+                />
+              ))}
             </div>
-          ))}
-        </div>
-      ) : null}
+          )}
+      </div>
     </div>
   );
 }
 
+// ─── Day column ───────────────────────────────────────────────────────────────
 function DayColumn({
-  day,
-  isActive,
-  isLast,
-  onSelect,
+  events,
+  isToday,
 }: {
-  day: ScheduleDay;
-  isActive: boolean;
-  isLast: boolean;
-  onSelect: (dayId: string) => void;
+  events: WeekScheduleEvent[];
+  isToday: boolean;
 }) {
-  const dayEvents = WEEK_SCHEDULE_EVENTS.filter(
-    (event) => event.dayId === day.id,
-  );
+  const positioned = resolveOverlaps(events);
 
   return (
     <div
-      className={cn(
-        "relative group flex flex-col",
-        isActive && "rounded-t-xl bg-surface-container-low/40",
-      )}
+      className="relative border-l border-gray-100"
+      style={{ height: TOTAL_H }}
     >
-      <button
-        type="button"
-        onClick={() => onSelect(day.id)}
-        className={cn(
-          "relative mb-2 flex h-14 w-full flex-col items-center justify-center border-b",
-          isActive ? "border-primary/10" : "border-slate-50",
-        )}
-      >
-        <span
-          className={cn(
-            "text-[10px] font-bold uppercase tracking-tighter",
-            isActive ? "text-primary" : "text-slate-400",
-          )}
-        >
-          {day.weekdayShort}
-        </span>
-        <span
-          className={cn(
-            "text-lg font-bold",
-            isActive ? "font-extrabold text-primary" : "text-slate-700",
-          )}
-        >
-          {day.dayOfMonth}
-        </span>
-        {isActive ? (
-          <div className="absolute -top-1 h-1.5 w-1.5 rounded-full bg-primary" />
-        ) : null}
-      </button>
+      {/* Hour grid lines */}
+      {HOURS.map((h) => (
+        <div
+          key={h}
+          className="absolute inset-x-0 border-t border-gray-100"
+          style={{ top: topPx(h * 60) }}
+        />
+      ))}
 
-      <div className={cn("flex-1", !isLast && "border-r border-slate-50/50")} />
+      {isToday && <NowLine />}
 
-      {dayEvents.map((event) => (
-        <EventCard key={event.id} event={event} />
+      {positioned.map((p) => (
+        <EventBlock key={p.event.id} {...p} />
       ))}
     </div>
   );
 }
 
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function WeeklyScheduleGrid({
   days,
   activeDayId,
@@ -193,51 +202,87 @@ export default function WeeklyScheduleGrid({
 }: {
   days: ScheduleDay[];
   activeDayId: string;
-  onDayChange: (dayId: string) => void;
+  onDayChange: (id: string) => void;
 }) {
-  const hourLines = Array.from(
-    { length: WEEK_SCHEDULE_TIMELINE.totalHours - 1 },
-    (_, i) => i,
+  // Build map: dayId → events
+  const eventMap = new Map<string, WeekScheduleEvent[]>(
+    days.map((d) => [d.id, []]),
   );
-
-  const indicatorMinutes = parseTimeToMinutes(
-    WEEK_SCHEDULE_TIMELINE.currentTime,
-  );
-  const indicatorTop = minutesToTopPx(indicatorMinutes);
+  WEEK_SCHEDULE_EVENTS.forEach((ev) => {
+    eventMap.get(ev.dayId)?.push(ev);
+  });
 
   return (
-    <div className="relative min-h-[800px]">
-      <div className="grid h-full grid-cols-[60px_repeat(7,1fr)]">
-        <TimelineColumn />
-
-        {days.map((day, index) => {
-          const isLast = index === days.length - 1;
-          const isActive = day.id === activeDayId;
-
+    <div className="flex flex-col overflow-hidden rounded-2xl bg-white">
+      {/* Day header */}
+      <div
+        className="grid border-b border-gray-100"
+        style={{ gridTemplateColumns: "52px repeat(7, 1fr)" }}
+      >
+        <div />
+        {days.map((day) => {
+          const active = day.id === activeDayId;
           return (
-            <DayColumn
+            <button
               key={day.id}
-              day={day}
-              isActive={isActive}
-              isLast={isLast}
-              onSelect={onDayChange}
-            />
+              type="button"
+              onClick={() => onDayChange(day.id)}
+              className="flex flex-col items-center gap-1 py-3 transition-colors hover:bg-gray-50"
+            >
+              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                {day.weekdayShort}
+              </span>
+              <div
+                className={cn(
+                  "cursor-pointer flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold",
+                  active ? "text-white" : "text-gray-600 hover:bg-gray-100",
+                )}
+                style={active ? { backgroundColor: "#4338CA" } : {}}
+              >
+                {day.dayOfMonth}
+              </div>
+              {active && (
+                <div
+                  className="h-1 w-1 rounded-full"
+                  style={{ backgroundColor: "#4338CA" }}
+                />
+              )}
+            </button>
           );
         })}
       </div>
 
-      <div
-        className="pointer-events-none absolute left-[60px] right-6 z-30 flex items-center"
-        style={{ top: indicatorTop }}
-      >
-        <div className="h-3 w-3 rounded-full bg-error ring-4 ring-error/20" />
-        <div className="h-[2px] flex-1 bg-error/40" />
-      </div>
+      {/* Scrollable grid */}
+      <div className="overflow-y-auto">
+        <div
+          className="relative grid"
+          style={{
+            gridTemplateColumns: "52px repeat(7, 1fr)",
+            height: TOTAL_H,
+          }}
+        >
+          {/* Hour labels */}
+          <div className="relative border-r border-gray-100">
+            {HOURS.map((h) => (
+              <div
+                key={h}
+                className="absolute right-2 text-[10px] font-semibold text-gray-400"
+                style={{ top: topPx(h * 60) - 7 }}
+              >
+                {formatHour(h)}
+              </div>
+            ))}
+          </div>
 
-      <div className="pointer-events-none absolute bottom-6 left-[60px] right-6 top-[110px]">
-        {hourLines.map((i) => (
-          <div key={i} className="h-[80px] border-b border-slate-50" />
-        ))}
+          {/* Day columns */}
+          {days.map((day) => (
+            <DayColumn
+              key={day.id}
+              events={eventMap.get(day.id) ?? []}
+              isToday={day.id === activeDayId}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

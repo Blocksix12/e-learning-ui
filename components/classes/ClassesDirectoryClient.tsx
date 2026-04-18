@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { ChevronDown, Plus } from "lucide-react";
 
 import type { ClassDirectoryItem, ClassesFilterKey } from "./types";
@@ -69,13 +70,13 @@ export default function ClassesDirectoryClient({
         </button>
 
         {/* New Class button */}
-        <button
-          type="button"
+        <Link
+          href="/class/classes/newClass"
           className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-indigo-700 px-6 py-2 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-800 active:scale-95"
         >
           <Plus className="h-4 w-4" />
           New Class
-        </button>
+        </Link>
       </div>
 
       <ClassGrid items={filteredItems} />

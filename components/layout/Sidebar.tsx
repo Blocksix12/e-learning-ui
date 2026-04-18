@@ -23,12 +23,12 @@ const NAV_ITEMS = [
     icon: Calendar,
   },
   {
-    href: "/class/class-dashboard?view=resources",
+    href: "/class/resources",
     label: "Resources",
     icon: FolderOpen,
   },
   {
-    href: "/class/class-dashboard?view=analytics",
+    href: "/class/analytics",
     label: "Analytics",
     icon: BarChart3,
   },
@@ -64,7 +64,11 @@ export default function Sidebar() {
             (item.label === "Classes" &&
               pathname.startsWith("/class/classes")) ||
             (item.label === "Schedule" &&
-              pathname.startsWith("/class/schedule"));
+              pathname.startsWith("/class/schedule")) ||
+            (item.label === "Resources" &&
+              pathname.startsWith("/class/resources")) ||
+            (item.label === "Analytics" &&
+              pathname.startsWith("/class/analytics"));
 
           return (
             <Link

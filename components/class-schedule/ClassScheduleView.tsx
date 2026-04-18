@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import {
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   FlaskConical,
   MapPin,
@@ -15,6 +17,18 @@ import { cn } from "@/lib/utils";
 import { SCHEDULE_DAYS, SCHEDULE_TITLE, TIMELINE_ROWS } from "./mockData";
 import type { ScheduleMode, TimelineEvent, TimelineRow } from "./types";
 import WeeklyScheduleGrid from "@/components/class-schedule/WeeklyScheduleGrid";
+import MonthCalendarGrid from "./MonthCalendarGrid";
+
+function formatMonthLabel(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function shiftMonth(date: Date, delta: number) {
+  return new Date(date.getFullYear(), date.getMonth() + delta, 1);
+}
 
 function TimelineMetaIcon({
   icon,
@@ -203,8 +217,16 @@ function TimelineRowView({ row }: { row: TimelineRow }) {
   );
 }
 
-export default function ClassScheduleView() {
-  const [mode, setMode] = useState<ScheduleMode>("day");
+export default function ClassScheduleView({
+  mode,
+  onModeChange,
+  onJoinLiveLecture,
+}: {
+  mode: ScheduleMode;
+  onModeChange: (mode: ScheduleMode) => void;
+  onJoinLiveLecture?: () => void;
+}) {
+  const [monthCursor, setMonthCursor] = useState(() => new Date(2025, 3, 1));
   const [activeDayId, setActiveDayId] = useState(
     SCHEDULE_DAYS.find((d) => d.isActive)?.id ?? SCHEDULE_DAYS[0]?.id ?? "sun",
   );
@@ -223,40 +245,95 @@ export default function ClassScheduleView() {
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-              {SCHEDULE_TITLE.monthLabel}
-            </h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+                {mode === "month"
+                  ? formatMonthLabel(monthCursor)
+                  : SCHEDULE_TITLE.monthLabel}
+              </h2>
+
+              {mode === "month" ? (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMonthCursor((prev) => shiftMonth(prev, -1))
+                    }
+                    className="cursor-pointer rounded-full p-2 text-slate-500 transition-colors hover:bg-gray-100"
+                    aria-label="Previous month"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setMonthCursor((prev) => shiftMonth(prev, 1))
+                    }
+                    className="cursor-pointer rounded-full p-2 text-slate-500 transition-colors hover:bg-gray-100"
+                    aria-label="Next month"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              ) : null}
+            </div>
             <p className="text-sm font-medium text-gray-500">
               {SCHEDULE_TITLE.semesterLabel} • {SCHEDULE_TITLE.weekLabel}
             </p>
           </div>
 
-          <div className="flex items-center rounded-full bg-gray-100 p-1">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center rounded-full bg-gray-100 p-1">
+              <button
+                type="button"
+                onClick={() => onModeChange("day")}
+                className={cn(
+                  "cursor-pointer rounded-full px-6 py-2 text-xs font-bold transition-all",
+                  mode === "day"
+                    ? "bg-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-800",
+                )}
+                style={mode === "day" ? { color: "#4338CA" } : {}}
+              >
+                Day
+              </button>
+              <button
+                type="button"
+                onClick={() => onModeChange("week")}
+                className={cn(
+                  "cursor-pointer rounded-full px-6 py-2 text-xs font-medium transition-all",
+                  mode === "week"
+                    ? "bg-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-800",
+                )}
+                style={mode === "week" ? { color: "#4338CA" } : {}}
+              >
+                Week
+              </button>
+              <button
+                type="button"
+                onClick={() => onModeChange("month")}
+                className={cn(
+                  "cursor-pointer rounded-full px-6 py-2 text-xs font-medium transition-all",
+                  mode === "month"
+                    ? "bg-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-800",
+                )}
+                style={mode === "month" ? { color: "#4338CA" } : {}}
+              >
+                Month
+              </button>
+            </div>
+
             <button
               type="button"
-              onClick={() => setMode("day")}
-              className={cn(
-                "rounded-full px-6 py-2 text-xs font-bold transition-all",
-                mode === "day"
-                  ? "bg-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-800",
-              )}
-              style={mode === "day" ? { color: "#4338CA" } : {}}
+              onClick={onJoinLiveLecture}
+              className="cursor-pointer inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] active:scale-95"
+              style={{ backgroundColor: "#4338CA" }}
+              aria-label="Join live lecture"
             >
-              Day
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("week")}
-              className={cn(
-                "rounded-full px-6 py-2 text-xs font-medium transition-all",
-                mode === "week"
-                  ? "bg-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-800",
-              )}
-              style={mode === "week" ? { color: "#4338CA" } : {}}
-            >
-              Week
+              <PlayCircle className="h-4 w-4" />
+              Join Live Lecture
             </button>
           </div>
         </div>
@@ -303,8 +380,18 @@ export default function ClassScheduleView() {
         ) : null}
       </section>
 
-      <section className="relative flex-1 overflow-hidden rounded-2xl bg-white p-8 shadow-sm">
-        {mode === "week" ? (
+      <section
+        className={cn(
+          "relative flex-1 overflow-hidden shadow-sm rounded-2xl bg-white",
+          mode !== "week" && mode !== "month" ? "p-8" : "",
+        )}
+      >
+        {mode === "month" ? (
+          <MonthCalendarGrid
+            year={monthCursor.getFullYear()}
+            monthIndex={monthCursor.getMonth()}
+          />
+        ) : mode === "week" ? (
           <WeeklyScheduleGrid
             days={days}
             activeDayId={activeDayId}
@@ -325,19 +412,6 @@ export default function ClassScheduleView() {
           </>
         )}
       </section>
-
-      <button
-        type="button"
-        className="group fixed bottom-8 right-8 z-50 flex items-center gap-2 rounded-full px-6 py-4 text-sm font-bold text-white shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
-        style={{
-          backgroundColor: "#4338CA",
-          boxShadow: "0 8px 25px rgba(67,56,202,0.4)",
-        }}
-        aria-label="Join live lecture"
-      >
-        <PlayCircle className="h-5 w-5 transition-transform group-hover:rotate-12" />
-        Join Live Lecture
-      </button>
     </>
   );
 }

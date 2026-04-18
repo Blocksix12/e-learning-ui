@@ -1,4 +1,4 @@
-export type ScheduleMode = "day" | "week";
+export type ScheduleMode = "day" | "week" | "month";
 
 export type ScheduleDay = {
   id: string;
@@ -85,4 +85,49 @@ export type WeekScheduleTimeline = {
   hourHeightPx: number;
   topOffsetPx: number;
   currentTime: string;
+};
+
+export type MonthCalendarEventVariant = "blue" | "green" | "orange" | "purple";
+
+export type MonthCalendarEvent = {
+  id: string;
+  label: string;
+  variant: MonthCalendarEventVariant;
+};
+
+export type MonthCalendarCell =
+  | { kind: "empty" }
+  | {
+      kind: "day";
+      dayNumber: number;
+      isSelected?: boolean;
+      events?: MonthCalendarEvent[];
+      moreLabel?: string;
+    };
+
+export type MonthAttendanceItem = {
+  id: string;
+  label: string;
+  percent: number;
+};
+
+export type MonthDeadlineIcon = "priority" | "science" | "description";
+
+export type MonthDeadlineItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: MonthDeadlineIcon;
+  variant: "error" | "primary" | "tertiary";
+};
+
+export type MonthQuickAction = {
+  id: string;
+  title: string;
+  icon: "log-hours" | "absence";
+};
+
+export type MonthCampusEvent = {
+  title: string;
+  subtitle: string;
 };

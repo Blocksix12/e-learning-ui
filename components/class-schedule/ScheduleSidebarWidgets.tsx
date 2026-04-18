@@ -30,7 +30,13 @@ function DeadlineAccent({
   return <div className="h-8 w-1 rounded-full" style={style} />;
 }
 
-export default function ScheduleSidebarWidgets() {
+type ScheduleSidebarWidgetsProps = {
+  onJoinCurrentClass?: () => void;
+};
+
+export default function ScheduleSidebarWidgets({
+  onJoinCurrentClass,
+}: ScheduleSidebarWidgetsProps) {
   return (
     <aside className="flex flex-col gap-6">
       {/* Attendance Rate */}
@@ -70,7 +76,7 @@ export default function ScheduleSidebarWidgets() {
             <button
               key={item.id}
               type="button"
-              className="flex w-full items-center gap-4 rounded-xl p-3 text-left transition-colors hover:bg-gray-50"
+              className="cursor-pointer flex w-full items-center gap-4 rounded-xl p-3 text-left transition-colors hover:bg-gray-50"
             >
               <DeadlineAccent accent={item.accent} />
               <div className="min-w-0 flex-1">
@@ -145,7 +151,8 @@ export default function ScheduleSidebarWidgets() {
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
-            className="col-span-2 flex items-center justify-center gap-3 rounded-2xl p-4 text-xs font-bold text-white transition-all duration-150 hover:scale-[1.02] active:scale-95"
+            onClick={onJoinCurrentClass}
+            className="cursor-pointer col-span-2 flex items-center justify-center gap-3 rounded-2xl p-4 text-xs font-bold text-white transition-all duration-150 hover:scale-[1.02] active:scale-95"
             style={{
               backgroundColor: "#4338CA",
               boxShadow: "0 4px 14px rgba(67,56,202,0.3)",
@@ -157,7 +164,7 @@ export default function ScheduleSidebarWidgets() {
 
           <button
             type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-center text-[10px] font-bold transition hover:bg-indigo-50"
+            className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-center text-[10px] font-bold transition hover:bg-indigo-50"
             style={{
               border: "1px solid rgba(67,56,202,0.2)",
               color: "#4338CA",
@@ -169,7 +176,7 @@ export default function ScheduleSidebarWidgets() {
 
           <button
             type="button"
-            className="inline-flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-center text-[10px] font-bold transition hover:bg-indigo-50"
+            className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-xl px-3 py-3 text-center text-[10px] font-bold transition hover:bg-indigo-50"
             style={{
               border: "1px solid rgba(67,56,202,0.2)",
               color: "#4338CA",

@@ -6,6 +6,6 @@ export default function CreateClassLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="px-6 pt-2 pb-12 max-w-5xl mx-auto w-full">{children}</div>
+    <div className="px-6 pt-8 pb-24 max-w-5xl mx-auto w-full">{children}</div>
   );
 }
