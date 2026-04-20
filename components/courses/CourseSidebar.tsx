@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { COURSES } from "@/components/courses/mockData";
 import {
   BarChart3,
   BookOpen,
@@ -35,6 +36,10 @@ const RESERVED_COURSE_SEGMENTS = new Set([
   "resources",
   "continue-learning",
   "assignments",
+  "notes",
+  "my-progress",
+  "performance",
+  "discussions",
 ]);
 
 function getCourseIdFromPathname(pathname: string) {
@@ -54,6 +59,10 @@ function buildNavGroups(params: {
   resourcesHref: string;
   continueLearningHref: string;
   assignmentsHref: string;
+  notesHref: string;
+  myProgressHref: string;
+  performanceHref: string;
+  discussionsHref: string;
 }): NavGroup[] {
   const {
     overviewHref,
@@ -61,6 +70,10 @@ function buildNavGroups(params: {
     resourcesHref,
     continueLearningHref,
     assignmentsHref,
+    notesHref,
+    myProgressHref,
+    performanceHref,
+    discussionsHref,
   } = params;
 
   return [
@@ -107,9 +120,11 @@ function buildNavGroups(params: {
             assignmentsHref !== "#" && pathname.startsWith(assignmentsHref),
         },
         {
-          href: "#",
+          href: notesHref,
           label: "Notes",
           icon: NotebookPen,
+          isActive: (pathname) =>
+            notesHref !== "#" && pathname.startsWith(notesHref),
         },
       ],
     },
@@ -117,14 +132,18 @@ function buildNavGroups(params: {
       title: "Progress",
       items: [
         {
-          href: "#",
+          href: myProgressHref,
           label: "My Progress",
           icon: TrendingUp,
+          isActive: (pathname) =>
+            myProgressHref !== "#" && pathname.startsWith(myProgressHref),
         },
         {
-          href: "#",
+          href: performanceHref,
           label: "Performance",
           icon: BarChart3,
+          isActive: (pathname) =>
+            performanceHref !== "#" && pathname.startsWith(performanceHref),
         },
       ],
     },
@@ -132,9 +151,11 @@ function buildNavGroups(params: {
       title: "Community",
       items: [
         {
-          href: "#",
+          href: discussionsHref,
           label: "Discussions",
           icon: MessageSquare,
+          isActive: (pathname) =>
+            discussionsHref !== "#" && pathname.startsWith(discussionsHref),
         },
         {
           href: "#",
@@ -149,6 +170,7 @@ function buildNavGroups(params: {
 export default function CourseSidebar() {
   const pathname = usePathname();
   const courseId = getCourseIdFromPathname(pathname);
+  const defaultCourseId = COURSES[0]?.id;
 
   const overviewHref = courseId
     ? `/admin/courses/${courseId}`
@@ -169,12 +191,40 @@ export default function CourseSidebar() {
     ? `${overviewHref}/assignments`
     : "/admin/courses/assignments";
 
+  const notesHref = courseId
+    ? `${overviewHref}/notes`
+    : defaultCourseId
+      ? `/admin/courses/${defaultCourseId}/notes`
+      : "/admin/courses";
+
+  const myProgressHref = courseId
+    ? `${overviewHref}/my-progress`
+    : defaultCourseId
+      ? `/admin/courses/${defaultCourseId}/my-progress`
+      : "/admin/courses";
+
+  const performanceHref = courseId
+    ? `${overviewHref}/performance`
+    : defaultCourseId
+      ? `/admin/courses/${defaultCourseId}/performance`
+      : "/admin/courses";
+
+  const discussionsHref = courseId
+    ? `${overviewHref}/discussions`
+    : defaultCourseId
+      ? `/admin/courses/${defaultCourseId}/discussions`
+      : "/admin/courses";
+
   const navGroups = buildNavGroups({
     overviewHref,
     curriculumHref,
     resourcesHref,
     continueLearningHref,
     assignmentsHref,
+    notesHref,
+    myProgressHref,
+    performanceHref,
+    discussionsHref,
   });
 
   return (
